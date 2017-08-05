@@ -31,38 +31,10 @@ class ListViewTest(TestCase):
         self.assertNotContains(response, 'other item 2')
 
     def test_passes_correct_list_to_template(self):
-        other_list = List.objects.create()
+        List.objects.create()  # so it's not first()
         correct_list = List.objects.create()
         response = self.client.get(f'/lists/{correct_list.id}/')
         self.assertEquals(response.context['list'], correct_list)
-
-
-class ListAndItemModelTest(TestCase):
-    def test_saving_and_retrieving_items(self):
-        list_ = List()
-        list_.save()
-
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.list = list_
-        second_item.save()
-
-        saved_list = List.objects.first()
-        self.assertEquals(saved_list, list_)
-        saved_items = Item.objects.all()
-        self.assertEquals(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEquals(first_saved_item.text, 'The first (ever) list item')
-        self.assertEquals(first_saved_item.list, list_)
-        self.assertEquals(second_saved_item.text, 'Item the second')
-        self.assertEquals(second_saved_item.list, list_)
 
 
 class NewListTest(TestCase):
@@ -82,7 +54,7 @@ class NewListTest(TestCase):
 
 class NewItemTest(TestCase):
     def test_can_save_a_POST_request_to_an_existing_list(self):
-        other_list = List.objects.create()
+        List.objects.create()  # so it's not first()
         correct_list = List.objects.create()
 
         self.client.post(
@@ -95,7 +67,7 @@ class NewItemTest(TestCase):
         self.assertEqual(new_item.list, correct_list)
 
     def test_redirects_to_list_view(self):
-        other_list = List.objects.create()
+        List.objects.create()  # so it's not first()
         correct_list = List.objects.create()
 
         response = self.client.post(
